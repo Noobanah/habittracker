@@ -22,6 +22,7 @@ export default function InputForm({ onAdd }) {
         <div>
             <h2>Add Category</h2>
             <input 
+                className="add-habit"
                 value={category} 
                 onChange={handleChange} 
                 onKeyDown={handleKeydown} 

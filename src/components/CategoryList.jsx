@@ -27,7 +27,8 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
     }
 
     return (
-        <ul>
+        <div className="container">
+            <ul className="category-card">
             {categoryList.map(([categoryName, habits]) => (
                 <li key={categoryName} className="category-item">
                     <div className="category-header">
@@ -36,6 +37,7 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                     </div>
                     <div className="add-habit">
                         <input
+                            className="add-habit"
                             value={habitInputs[categoryName] || ""}
                             onChange={(event) => handleChange(event, categoryName)}
                             onKeyDown={(event) => handleKeydown(event, categoryName)}
@@ -56,6 +58,7 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                     </ul>
                 </li>
             ))}
-        </ul>
+            </ul>
+        </div>
     );
 }

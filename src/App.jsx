@@ -3,6 +3,7 @@ import InputForm from './components/ImportForm';
 import CategoryList from './components/CategoryList';
 import PastHabit from './components/PastHabit';
 import ModalCalendar from "./components/ModalCalendar"
+import Header from './components/Header';
 import "./App.css"
 
 function App() {
@@ -20,7 +21,7 @@ function App() {
 
     const [habitList, setHabitList] = useState(() => {
       const storedHabits = JSON.parse(localStorage.getItem("habitList"));
-      return storedHabits !== null ? storedHabits : defaultHabits; // Use stored data if available
+      return storedHabits !== null ? storedHabits : defaultHabits; 
     });
   
     const [pastHabit, setPastHabit] = useState(() => {
@@ -28,7 +29,6 @@ function App() {
     });
 
   const today = new Date().toLocaleDateString();
-  //const [pastHabit, setPastHabit] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(today)
 
@@ -177,6 +177,7 @@ function App() {
   return (
     <div>
       {isModalOpen && <ModalCalendar setDate={setDate} onClose={() => setIsModalOpen(false)} />}
+      <Header today={today} />
       <InputForm onAdd={addCategory} />
       <CategoryList
         habitList={habitList}

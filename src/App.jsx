@@ -5,18 +5,19 @@ import PastHabit from './components/PastHabit';
 import ModalCalendar from "./components/ModalCalendar"
 import Header from './components/Header';
 import {getUserLocation, getLocationName} from "./Services/fetchWeather"
+import { v4 as uuidv4 } from 'uuid'; 
 import "./App.css"
 
 function App() {
 
   const defaultHabits = {
     health: [
-      { id: "meditation", name: "meditation", amount: 0, completed: false, edit: false },
-      { id: "workout", name: "workout", amount: 0, completed: false, edit: false }
+      { id: uuidv4(), name: "meditation", amount: 0, completed: false, edit: false },
+      { id: uuidv4(), name: "workout", amount: 0, completed: false, edit: false }
     ],
     home: [
-      { id: "take out the trash", name: "take out the trash", amount: 0, completed: false, edit: false },
-      { id: "clean bedroom", name: "clean bedroom", amount: 0, completed: false, edit: false }
+      { id: uuidv4(), name: "take out the trash", amount: 0, completed: false, edit: false },
+      { id: uuidv4(), name: "clean bedroom", amount: 0, completed: false, edit: false }
     ]
   }
 
@@ -70,13 +71,13 @@ function App() {
       localStorage.removeItem("pastHabit");
       setHabitList({
         health:[
-          {id: "meditation", 
+          {id: uuidv4(), 
             name: "meditation",
           amount: 0,
           completed: false, 
           edit: false
           },
-          {id: "workout", 
+          {id: uuidv4(), 
             name: "workout", 
             amount: 0,
             completed: false, 
@@ -84,13 +85,13 @@ function App() {
           }
           ],
         home: [
-          {id: "take out the trash",
+          {id: uuidv4(),
             name: "take out the trash",
             amount: 0,
             completed: false, 
             edit: false
           }, 
-          {id: "clean bedroom",
+          {id: uuidv4(),
             name: "clean bedroom",
             amount: 0,
             completed: false, 
@@ -117,8 +118,8 @@ function App() {
     setHabitList((prev) => ({
       ...prev,
       [category]: prev[category]
-        ? [...prev[category], { id: habitName, name: habitName, amount: 0, completed: false }]
-        : [{ id: habitName, name: habitName, amount: 0, completed: false }]
+        ? [...prev[category], { id: uuidv4(), name: habitName, amount: 0, completed: false, edit: false}]
+        : [{ id: uuidv4(), name: habitName, amount: 0, completed: false, edit: false }]
     }));
   }
 
@@ -139,6 +140,26 @@ function App() {
     }));
   }
 
+  function editHabit(newNameHabit, category, habitId) {
+    setHabitList(prev => {
+      const updatedList = {
+        ...prev,
+        [category]: prev[category]
+          ? prev[category].map(habit =>
+              habit.id === habitId
+                ? {
+                    ...habit,
+                    name: newNameHabit,
+                    edit: false
+                  }
+                : habit
+            )
+          : []
+      };
+      return updatedList;
+    });
+}
+
   function completeHabit(habitId, category, amount) {
     setHabitList(prev => {
       const updatedList = {
@@ -150,6 +171,7 @@ function App() {
                     ...habit,
                     amount: habit.amount + amount,
                     completed: !habit.completed,
+                    edit: false,
                     date: today
                   }
                 : habit
@@ -172,7 +194,7 @@ function App() {
     });
   }
 
-  function enableEdit(habitId, category, edit) {
+  function enableEdit(habitId, category) {
     setHabitList(prev => {
       const updatedList = {
         ...prev,
@@ -221,6 +243,7 @@ function App() {
         onComplete={completeHabit}
         setIsModalOpen={setIsModalOpen}
         onEdit={enableEdit}
+        onSubmitEdit={editHabit}
       />
       <PastHabit filteredHabits={filteredHabits} setIsModalOpen={setIsModalOpen} />
       <button onClick={reset}>

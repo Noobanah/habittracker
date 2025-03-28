@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function CategoryList({ habitList, onAddHabit, onComplete, onDeleteCategory, onDeleteHabit, onEdit }) {
+export default function CategoryList({ habitList, onAddHabit, onComplete, onDeleteCategory, onDeleteHabit, onEdit, onSubmitEdit }) {
     const categoryList = Object.entries(habitList);
     const [habitInputs, setHabitInputs] = useState({}); 
 
@@ -26,6 +26,22 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
         }
     }
 
+    function handleEditKeyDown(event, categoryName, habitId) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+    
+            const editedHabit = habitInputs[categoryName]?.trim() || ""; // Ensure it has a valid string
+    
+            if (editedHabit) {
+                onSubmitEdit(editedHabit, categoryName, habitId);
+                setHabitInputs((prev) => ({
+                    ...prev,
+                    [categoryName]: "",
+                }));
+            }
+        }
+    }
+
     return (
         <div className="container">
             <ul className="category-card">
@@ -47,10 +63,15 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                     <ul>
                     {habits.map((habit) => (
                         habit.edit === true ? (
-                            <input key={habit.id} placeholder={habit.name} />
+                            <input 
+                                key={habit.id} 
+                                placeholder={habit.name} 
+                                onChange={(event) => handleChange(event, categoryName)}
+                                onKeyDown={(event) => handleEditKeyDown(event, categoryName, habit.id)}
+                            />
                         ) : (
-                            <li key={habit.id} onClick={() => onEdit(habit.id, categoryName)} className="habit-item">
-                                <span className="habit-name"> {habit.name} {habit.amount} </span>
+                            <li key={habit.id} className="habit-item">
+                                <span onClick={() => onEdit(habit.id, categoryName)} className="habit-name"> {habit.name} {habit.amount} </span>
                                 <div className="habit-actions">
                                     {habit.completed ? (
                                         <button className="minus-btn" onClick={() => onComplete(habit.id, categoryName, -1)}>-</button>

@@ -6,7 +6,6 @@ export default function ModalCalendar({setDate, onClose}) {
     const handleDateChange = (selectedDate) => {
         const formattedDate = new Date(selectedDate).toLocaleDateString();
         setDate(formattedDate); 
-        console.log(formattedDate)
         onClose()
     }
 
@@ -20,3 +19,4 @@ export default function ModalCalendar({setDate, onClose}) {
         
     )
 }
+

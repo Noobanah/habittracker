@@ -10,19 +10,17 @@ export default function InputForm({ onAdd }) {
     function handleKeydown(event) {
         if (event.key === "Enter") {
             event.preventDefault();
-
             if (!category.trim()) return; 
-            console.log(category);
             onAdd(category.trim()); 
             setCategory(""); 
         }
     }
 
     return (
-        <div>
+        <div className="main-input-container">
             <h2>Add Category</h2>
             <input 
-                className="add-habit"
+                className="main-input-box"
                 value={category} 
                 onChange={handleChange} 
                 onKeyDown={handleKeydown} 

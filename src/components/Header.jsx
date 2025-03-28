@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Header = ({ today }) => {
+const Header = ({ today, placeName }) => {
     return (
-        <h2>{today}</h2>
+        <h2>{today} {placeName}</h2>
     );
 };
 

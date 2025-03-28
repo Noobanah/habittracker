@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function CategoryList({ habitList, onAddHabit, onComplete, onDeleteCategory, onDeleteHabit }) {
+export default function CategoryList({ habitList, onAddHabit, onComplete, onDeleteCategory, onDeleteHabit, onEdit }) {
     const categoryList = Object.entries(habitList);
     const [habitInputs, setHabitInputs] = useState({}); 
 
@@ -33,7 +33,7 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                 <li key={categoryName} className="category-item">
                     <div className="category-header">
                         <strong>{categoryName}</strong>
-                        <button onClick={() => onDeleteCategory(categoryName)}>Delete Category</button>
+                        <button onClick={() => onDeleteCategory(categoryName)}>Delete</button>
                     </div>
                     <div className="add-habit">
                         <input
@@ -45,16 +45,23 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                         />
                     </div>
                     <ul>
-                        {habits.map((habit) => (
-                            <li key={habit.id} className="habit-item">
+                    {habits.map((habit) => (
+                        habit.edit === true ? (
+                            <input key={habit.id} placeholder={habit.name} />
+                        ) : (
+                            <li key={habit.id} onClick={() => onEdit(habit.id, categoryName)} className="habit-item">
                                 <span className="habit-name"> {habit.name} {habit.amount} </span>
                                 <div className="habit-actions">
-                                    {habit.completed ? <button className="minus-btn" onClick={() => onComplete(habit.id, categoryName, - 1)}>-</button> :
-                                    <button className="plus-btn" onClick={() => onComplete(habit.id, categoryName, 1)}>+</button>}
-                                    <button className="delete-btn" onClick={() => onDeleteHabit(habit.id, categoryName)}>Delete Habit</button>
+                                    {habit.completed ? (
+                                        <button className="minus-btn" onClick={() => onComplete(habit.id, categoryName, -1)}>-</button>
+                                    ) : (
+                                        <button className="plus-btn" onClick={() => onComplete(habit.id, categoryName, 1)}>+</button>
+                                    )}
+                                    <button className="delete-btn" onClick={() => onDeleteHabit(habit.id, categoryName)}>Delete</button>
                                 </div>
                             </li>
-                        ))}
+                        )
+                    ))}
                     </ul>
                 </li>
             ))}

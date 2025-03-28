@@ -4,18 +4,19 @@ import CategoryList from './components/CategoryList';
 import PastHabit from './components/PastHabit';
 import ModalCalendar from "./components/ModalCalendar"
 import Header from './components/Header';
+import {getUserLocation, getLocationName} from "./Services/fetchWeather"
 import "./App.css"
 
 function App() {
 
   const defaultHabits = {
     health: [
-      { id: "meditation", name: "meditation", amount: 0, completed: false },
-      { id: "workout", name: "workout", amount: 0, completed: false }
+      { id: "meditation", name: "meditation", amount: 0, completed: false, edit: false },
+      { id: "workout", name: "workout", amount: 0, completed: false, edit: false }
     ],
     home: [
-      { id: "take out the trash", name: "take out the trash", amount: 0, completed: false },
-      { id: "clean bedroom", name: "clean bedroom", amount: 0, completed: false }
+      { id: "take out the trash", name: "take out the trash", amount: 0, completed: false, edit: false },
+      { id: "clean bedroom", name: "clean bedroom", amount: 0, completed: false, edit: false }
     ]
   }
 
@@ -31,25 +32,23 @@ function App() {
   const today = new Date().toLocaleDateString();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [date, setDate] = useState(today)
+  const [placeName, setPlaceName] = useState("");
 
 
   useEffect(() => {
-    const storedHabitList = JSON.parse(localStorage.getItem("habitList")) || [];
-    setHabitList(storedHabitList);
-
-    const storedPastHabit = JSON.parse(localStorage.getItem("pastHabit")) || [];
-    setPastHabit(storedPastHabit);
-  }, []);
-
-  useEffect(() => {
-    console.log("Updated habitList:", habitList);
-    console.log("Updated pastHabit:", pastHabit);
-  
     localStorage.setItem("habitList", JSON.stringify(habitList));
     localStorage.setItem("pastHabit", JSON.stringify(pastHabit));
   }, [habitList, pastHabit]);
 
-
+  useEffect(() => {
+    getUserLocation()
+    .then(({ lat, lon }) => {
+          getLocationName(lat, lon).then((name) => setPlaceName(name));
+    })
+    .catch((error) => {
+      console.error("Error getting location:", error);
+    });
+  },[])
 
   useEffect(() => {
     setHabitList((prev) => {
@@ -74,24 +73,28 @@ function App() {
           {id: "meditation", 
             name: "meditation",
           amount: 0,
-          completed: false
+          completed: false, 
+          edit: false
           },
           {id: "workout", 
             name: "workout", 
             amount: 0,
-            completed: false
+            completed: false, 
+            edit: false
           }
           ],
         home: [
           {id: "take out the trash",
             name: "take out the trash",
             amount: 0,
-            completed: false
+            completed: false, 
+            edit: false
           }, 
           {id: "clean bedroom",
             name: "clean bedroom",
             amount: 0,
-            completed: false
+            completed: false, 
+            edit: false
           }
         ]
       })
@@ -169,15 +172,46 @@ function App() {
     });
   }
 
+  function enableEdit(habitId, category, edit) {
+    setHabitList(prev => {
+      const updatedList = {
+        ...prev,
+        [category]: prev[category]
+          ? prev[category].map(habit =>
+              habit.id === habitId
+                ? {
+                    ...habit,
+                    edit: true
+                  }
+                : habit
+            )
+          : []
+      };
+
+      const foundHabit = updatedList[category]?.find(habit => habit.id === habitId);
+      if (!foundHabit) return prev;
+
+      if (foundHabit.completed === true) {
+        setPastHabit(prev => {
+          const isAlreadyAdded = prev.some(habit => habit.id === foundHabit.id && habit.category === category);
+          return isAlreadyAdded ? prev : [...prev, { ...foundHabit, category, date: today }];
+        });
+      } else {
+        setPastHabit(prev => prev.filter(habit => !(habit.id === foundHabit.id && habit.category === category)));
+      }
+      return updatedList;
+    });
+  }
+
   const filteredHabits = pastHabit.filter(
     (h) => h.date === date
   );
 
  
   return (
-    <div>
+    <div classname="main-container">
       {isModalOpen && <ModalCalendar setDate={setDate} onClose={() => setIsModalOpen(false)} />}
-      <Header today={today} />
+      <Header today={today} placeName={placeName}/>
       <InputForm onAdd={addCategory} />
       <CategoryList
         habitList={habitList}
@@ -186,6 +220,7 @@ function App() {
         onDeleteHabit={deleteHabit}
         onComplete={completeHabit}
         setIsModalOpen={setIsModalOpen}
+        onEdit={enableEdit}
       />
       <PastHabit filteredHabits={filteredHabits} setIsModalOpen={setIsModalOpen} />
       <button onClick={reset}>

@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import InputForm from './components/ImportForm';
 import CategoryList from './components/CategoryList';
 import PastHabit from './components/PastHabit';
 import ModalCalendar from "./components/ModalCalendar"
+import ModalAlert from './components/ModalAlert';
 import Header from './components/Header';
 import {getUserLocation, getLocationName} from "./Services/fetchWeather"
 import { v4 as uuidv4 } from 'uuid'; 
@@ -31,7 +32,7 @@ function App() {
     });
 
   const today = new Date().toLocaleDateString();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(null);
   const [date, setDate] = useState(today)
   const [placeName, setPlaceName] = useState("");
 
@@ -105,7 +106,7 @@ function App() {
 
   function addCategory(category) {
     if (category in habitList) {
-      alert("You already have this category");
+      setIsModalOpen("alert");
     } else {
       setHabitList((prev) => ({
         ...prev,
@@ -171,7 +172,6 @@ function App() {
                     ...habit,
                     amount: habit.amount + amount,
                     completed: !habit.completed,
-                    edit: false,
                     date: today
                   }
                 : habit
@@ -225,14 +225,23 @@ function App() {
     });
   }
 
-  const filteredHabits = pastHabit.filter(
+  const filterByDate = pastHabit.filter(
     (h) => h.date === date
   );
 
+  const filteredHabits = useMemo(() => {
+    return filterByDate.reduce((acc, habit) => {
+      acc[habit.category] = acc[habit.category] || [];
+      acc[habit.category].push(habit);
+      return acc;
+    }, {});
+}, [filterByDate]);
+
  
   return (
-    <div classname="main-container">
-      {isModalOpen && <ModalCalendar setDate={setDate} onClose={() => setIsModalOpen(false)} />}
+    <div className="main-container">
+      {isModalOpen === "calendar" && <ModalCalendar setDate={setDate} onClose={() => setIsModalOpen(null)} />}
+      {isModalOpen === "alert" && <ModalAlert onClose={() => setIsModalOpen(null)} />}
       <Header today={today} placeName={placeName}/>
       <InputForm onAdd={addCategory} />
       <CategoryList
@@ -245,7 +254,7 @@ function App() {
         onEdit={enableEdit}
         onSubmitEdit={editHabit}
       />
-      <PastHabit filteredHabits={filteredHabits} setIsModalOpen={setIsModalOpen} />
+      <PastHabit date={date} filteredHabits={filteredHabits} setIsModalOpen={setIsModalOpen} />
       <button onClick={reset}>
           Reset
         </button>

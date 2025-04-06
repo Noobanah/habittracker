@@ -30,7 +30,7 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
         if (event.key === "Enter") {
             event.preventDefault();
     
-            const editedHabit = habitInputs[categoryName]?.trim() || ""; // Ensure it has a valid string
+            const editedHabit = habitInputs[categoryName]?.trim() || ""
     
             if (editedHabit) {
                 onSubmitEdit(editedHabit, categoryName, habitId);
@@ -54,7 +54,7 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                     <div className="add-habit">
                         <input
                             className="add-habit"
-                            value={habitInputs[categoryName] || ""}
+                            // value={habitInputs[categoryName] || ""}
                             onChange={(event) => handleChange(event, categoryName)}
                             onKeyDown={(event) => handleKeydown(event, categoryName)}
                             placeholder="Add New Habit"
@@ -65,13 +65,14 @@ export default function CategoryList({ habitList, onAddHabit, onComplete, onDele
                         habit.edit === true ? (
                             <input 
                                 key={habit.id} 
+                                className="add-habit"
                                 placeholder={habit.name} 
                                 onChange={(event) => handleChange(event, categoryName)}
                                 onKeyDown={(event) => handleEditKeyDown(event, categoryName, habit.id)}
                             />
                         ) : (
                             <li key={habit.id} className="habit-item">
-                                <span onClick={() => onEdit(habit.id, categoryName)} className="habit-name"> {habit.name} {habit.amount} </span>
+                                <span onClick={() => onEdit(habit.id, categoryName)} className="habit-name"> {habit.name} ({habit.amount}) </span>
                                 <div className="habit-actions">
                                     {habit.completed ? (
                                         <button className="minus-btn" onClick={() => onComplete(habit.id, categoryName, -1)}>-</button>

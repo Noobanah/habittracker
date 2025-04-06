@@ -18,7 +18,6 @@ export default function InputForm({ onAdd }) {
 
     return (
         <div className="main-input-container">
-            <h2>Add Category</h2>
             <input 
                 className="main-input-box"
                 value={category} 

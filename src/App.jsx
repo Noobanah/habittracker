@@ -309,7 +309,6 @@ function App() {
       {isModalOpen === "alert" && (
         <ModalAlert onClose={() => setIsModalOpen(null)} />
       )}
-      <h1>Test</h1>
       <Header today={today} placeName={placeName} />
       <InputForm onAdd={addCategory} />
       <CategoryList
